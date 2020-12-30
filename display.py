@@ -80,10 +80,10 @@ def timeStamp2time(ts):
     return datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
 def cacUseTime(startTime, endTime):
-    if startTime > 0 and endTime != 0:
-        return str((datetime.datetime.now() - datetime.datetime.fromtimestamp(startTime))).split('.')[0]
-    elif startTime > 0:
+    if startTime <= endTime:
         return str((datetime.datetime.fromtimestamp(endTime) - datetime.datetime.fromtimestamp(startTime))).split('.')[0]
+    elif startTime > 0:
+        return str((datetime.datetime.now() - datetime.datetime.fromtimestamp(startTime))).split('.')[0]
     else:
         return 'nil'
 
