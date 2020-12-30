@@ -1,0 +1,3 @@
+## bilibili-recording-monitor
+开发中...
+bilibili-recording-go的监控界面，同时目前作为上传手段
