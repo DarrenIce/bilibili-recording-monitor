@@ -34,6 +34,7 @@ class Info:
     uploadEndTime:      int
     needUpload:         bool
     state:              int
+    areaName:           str
 
     @property
     def stateMap(self) -> str:
@@ -41,11 +42,11 @@ class Info:
             return 'iinit'
         elif self.state == 1:
             return 'start'
-        elif self.state == 2:
-            return 'running'
         elif self.state == 3:
-            return 'waiting'
+            return 'running'
         elif self.state == 4:
+            return 'waiting'
+        elif self.state == 2:
             return 'restart'
         elif self.state == 5:
             return 'decoding'
@@ -80,7 +81,7 @@ def timeStamp2time(ts):
     return datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
 def cacUseTime(startTime, endTime):
-    if startTime <= endTime:
+    if startTime < endTime:
         return str((datetime.datetime.fromtimestamp(endTime) - datetime.datetime.fromtimestamp(startTime))).split('.')[0]
     elif startTime > 0:
         return str((datetime.datetime.now() - datetime.datetime.fromtimestamp(startTime))).split('.')[0]
@@ -129,7 +130,8 @@ class Display():
             uploadStartTime=liveInfo['UploadStartTime'],
             uploadEndTime=liveInfo['UploadEndTime'],
             needUpload=liveInfo['NeedUpload'],
-            state=liveInfo['State']
+            state=liveInfo['State'],
+            areaName=liveInfo['AreaName']
         )
 
     def createInfoTable(self, liveInfos):
@@ -140,7 +142,7 @@ class Display():
             reverse=True
         )
         table1 = Table(
-            "行号", "房间ID", "主播", "直播标题", "直播状态", "开播时间", "录制时间", "转码用时", "上传用时", "当前状态",
+            "行号", "房间ID", "主播", "分区", "直播标题", "直播状态", "开播时间", "录制时间", "转码用时", "上传用时", "当前状态",
             title="%s" % datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             box=box.SIMPLE
         )
@@ -150,6 +152,7 @@ class Display():
                 str(info.rowID),
                 info.roomID,
                 info.uname,
+                info.areaName,
                 info.title,
                 str(info.liveStatus),
                 info.liveStartTimeMap,
