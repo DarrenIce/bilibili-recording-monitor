@@ -9,6 +9,7 @@ from dataclasses import dataclass
 import psutil
 import json
 import requests
+from win10toast import ToastNotifier
 
 @dataclass
 class Info:
@@ -53,11 +54,11 @@ class Info:
         elif self.state == 6:
             return 'decodeEnd'
         elif self.state == 7:
-            return 'updateWait'
+            return 'uploadWait'
         elif self.state == 8:
-            return 'updating'
+            return 'uploading'
         elif self.state == 9:
-            return 'updateEnd'
+            return 'uploadEnd'
         elif self.state == 10:
             return 'stop'
 
@@ -187,9 +188,19 @@ class Display():
         )
 
     def run(self):
+        r = requests.get("http://127.0.0.1:18080/api/infos")
+        self.infos = json.loads(r.text)['RoomInfos']
         with Live(console=self.console, auto_refresh=False) as live:
             while True:
-                r = requests.get("http://127.0.0.1:18080/api/infos")
-                infos = json.loads(r.text)['RoomInfos']
-                live.update(self.createInfoTable(infos), refresh=True)
+                self.notify()
+                live.update(self.createInfoTable(self.infos), refresh=True)
                 time.sleep(1)
+
+    def notify(self):
+        r = requests.get("http://127.0.0.1:18080/api/infos")
+        infos = json.loads(r.text)['RoomInfos']
+        for roomID in infos:
+            if infos[roomID]['LiveStatus'] == 1 and self.infos[roomID]['LiveStatus'] != 1:
+                toaster = ToastNotifier()
+                toaster.show_toast("开播通知", '%s[RoomID:%s]开播了' % (infos[roomID]['Uname'], roomID), icon_path=None, duration=3)
+        self.infos = infos
