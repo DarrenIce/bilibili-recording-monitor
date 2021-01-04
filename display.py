@@ -188,8 +188,11 @@ class Display():
         )
 
     def run(self):
-        r = requests.get("http://127.0.0.1:18080/api/infos")
-        self.infos = json.loads(r.text)['RoomInfos']
+        try:
+            r = requests.get("http://127.0.0.1:18080/api/infos")
+            self.infos = json.loads(r.text)['RoomInfos']
+        except:
+            self.infos = {}
         with Live(console=self.console, auto_refresh=False) as live:
             while True:
                 self.notify()
@@ -197,10 +200,13 @@ class Display():
                 time.sleep(1)
 
     def notify(self):
-        r = requests.get("http://127.0.0.1:18080/api/infos")
-        infos = json.loads(r.text)['RoomInfos']
-        for roomID in infos:
-            if infos[roomID]['LiveStatus'] == 1 and self.infos[roomID]['LiveStatus'] != 1:
-                toaster = ToastNotifier()
-                toaster.show_toast("开播通知", '%s[RoomID:%s]开播了' % (infos[roomID]['Uname'], roomID), icon_path=None, duration=3)
-        self.infos = infos
+        try:
+            r = requests.get("http://127.0.0.1:18080/api/infos")
+            infos = json.loads(r.text)['RoomInfos']
+            for roomID in infos:
+                if infos[roomID]['LiveStatus'] == 1 and self.infos[roomID]['LiveStatus'] != 1:
+                    toaster = ToastNotifier()
+                    toaster.show_toast("开播通知", '%s[RoomID:%s]开播了' % (infos[roomID]['Uname'], roomID), icon_path=None, duration=3)
+            self.infos = infos
+        except:
+            pass
